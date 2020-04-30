@@ -1,0 +1,28 @@
+---
+
+- name: Check where bash is installed
+  command: which bash
+  register: kind_check_bash_path
+  failed_when: false
+  changed_when: false
+
+- name: Fail play if architecture is not amd64
+  fail:
+    msg: This role only supports x86_64 processors.
+  when: ansible_architecture != "x86_64"
+
+- name: Check for existing kind binary
+  stat:
+    path: "{{ kind_install_dir }}/kind"
+  register: kind_check_existing
+
+- name: Check kind binary version if binary already exists
+  shell: >
+    set -o pipefail && \
+      {{ kind_install_dir }}/kind --version 2>&1 | \
+      awk '{ print $NF }'
+  args:
+    executable: "{{ kind_check_bash_path.stdout_lines[0] }}"
+  changed_when: false
+  register: kind_check_existing_version
+  when: kind_check_existing.stat.exists

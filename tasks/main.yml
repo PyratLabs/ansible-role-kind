@@ -1,0 +1,12 @@
+---
+
+- import_tasks: pre-checks.yml
+
+- import_tasks: get-version.yml
+  when: kind_version is not defined or not kind_version
+
+- import_tasks: download-kind.yml
+
+- import_tasks: install-kind.yml
+
+- import_tasks: post-checks.yml

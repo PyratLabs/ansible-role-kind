@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  become_user: k8suser
+  roles:
+    - role: xanmanning.kind

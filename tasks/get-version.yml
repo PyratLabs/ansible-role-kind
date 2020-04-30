@@ -1,0 +1,12 @@
+---
+
+- name: Get the version information of the latest release of kind
+  uri:
+    url: "{{ kind_github_api }}/releases/latest"
+    return_content: true
+    body_format: json
+  register: kind_get_latest_version
+
+- name: Ensure the kind_version variable is set
+  set_fact:
+    kind_version: "{{ kind_get_latest_version.json.tag_name | regex_replace('^v', '') }}"

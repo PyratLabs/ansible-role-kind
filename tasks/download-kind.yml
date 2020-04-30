@@ -1,0 +1,11 @@
+---
+
+- name: Get the binary path for kind
+  set_fact:
+    kind_binary_path: "v{{ kind_version }}/kind-linux-amd64"
+
+- name: Ensure kind binary is downloaded
+  get_url:
+    url: "{{ kind_release_baseurl }}/{{ kind_binary_path }}"
+    dest: "/tmp/kind-{{ kind_version }}"
+    mode: 0600

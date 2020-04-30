@@ -1,0 +1,32 @@
+---
+
+- name: Check the state of the new kind package
+  stat:
+    path: "{{ kind_install_dir }}/kind"
+  register: kind_check_installed
+
+- name: Fail play if kind is not installed as expected
+  assert:
+    that:
+      - kind_check_installed.stat.exists
+      - kind_check_installed.stat.islnk
+    fail_msg: kind was not installed as expected, it is likely something went wrong.
+    success_msg: kind has been installed as expected.
+
+- name: Check the kind binary version matches the expected version
+  shell: >
+    set -o pipefail && \
+      {{ kind_install_dir }}/kind --version 2>&1 | \
+      awk '{ print $NF }'
+  args:
+    executable: "{{ kind_check_bash_path.stdout_lines[0] }}"
+  changed_when: false
+  failed_when: false
+  register: kind_check_installed_version
+
+- name: Fail play if kind is not the expected version
+  assert:
+    that:
+      - kind_check_installed_version.stdout_lines[0] == kind_version
+    fail_msg: Installed kind version is not as expected, it is likely something went wrong.
+    success_msg: Installed kind version is as expected.

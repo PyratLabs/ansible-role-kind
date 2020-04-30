@@ -1,0 +1,31 @@
+---
+
+- name: Ensure kind_install_dir exists
+  file:
+    path: "{{ kind_install_dir }}"
+    state: directory
+
+- name: Ensure existing kind package is moved to keep an copy of the old version
+  command: >
+      mv {{ kind_install_dir }}/kind
+      {{ kind_install_dir }}/kind-{{ kind_check_existing_version.stdout_lines[0] }}
+  when:
+    kind_check_existing.stat.islnk is defined
+    and not kind_check_existing.stat.islnk
+    and kind_check_existing_version.stdout_lines[0] != kind_version
+
+- name: Ensure kind binary is copied to the installation directory
+  copy:
+    src: "/tmp/kind-{{ kind_version }}"
+    dest: "{{ kind_install_dir }}/kind-{{ kind_version }}"
+    remote_src: true
+    mode: 0755
+  when: not kind_check_existing.stat.exists
+        or (kind_check_existing.stat.exists
+            and kind_check_existing_version.stdout_lines[0] != kind_version)
+
+- name: Ensure kind package is symlinked
+  file:
+    src: "{{ kind_install_dir }}/kind-{{ kind_version }}"
+    dest: "{{ kind_install_dir }}/kind"
+    state: link

@@ -1,0 +1,7 @@
+---
+
+# Use a specific version of kind, eg. `1.6.2`. Specify `false` for latest.
+kind_version: false
+
+# Installation directory for kind.
+kind_install_dir: "{{ ansible_user_dir }}/bin"
